@@ -23,7 +23,7 @@ export function StoreCard({ app, featured = false }: { app: StoreApp; featured?:
           <span className="inline-flex items-center gap-1 font-semibold text-[#3c4043]"><Star className="h-3.5 w-3.5 fill-[#f4b400] text-[#f4b400]" />{Number(app.rating).toFixed(1)}</span>
           <span>{app.category}</span>
           <span className="inline-flex items-center gap-1"><Download className="h-3.5 w-3.5" />{app.downloads}</span>
-          <span className="ml-auto"><StoreGetButton app={app} /></span>
+          <span className="ml-auto"><StoreGetButton slug={app.slug} /></span>
         </div>
       </div>
     </article>
