@@ -4,5 +4,28 @@ import type { StoreApp } from '@/lib/v3-data';
 import { StoreGetButton } from './store-get-button';
 
 export function StoreCard({ app, featured = false }: { app: StoreApp; featured?: boolean }) {
-  return <article className={`group overflow-hidden rounded-[26px] border border-white/10 bg-[#15131D] shadow-store transition duration-300 hover:-translate-y-1 hover:border-white/20 ${featured ? 'min-w-[300px] md:min-w-0' : ''}`}><Link href={`/app/${app.slug}`} className={`relative block overflow-hidden bg-gradient-to-br ${app.accent} ${featured ? 'h-52' : 'h-40'}`}><div className="absolute -right-12 -top-16 h-48 w-48 rounded-full border border-white/20 bg-white/10 blur-2xl transition duration-500 group-hover:scale-125" /><div className="absolute left-5 top-5 flex items-center justify-between right-5"><span className="rounded-full bg-black/20 px-2.5 py-1 text-[0.58rem] font-black uppercase tracking-[0.16em] text-white/80 backdrop-blur-sm">{app.category}</span><span className="text-2xl">{app.category === 'Food' ? '🍲' : app.category === 'Fashion' ? '✦' : app.category === 'Games' ? '⌘' : '✺'}</span></div><div className="absolute bottom-5 left-5 flex items-end gap-3 text-white"><span className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-black/15 text-sm font-black backdrop-blur-sm">{app.icon}</span><div><h3 className="font-display text-2xl font-black tracking-[-0.055em]">{app.name}</h3><p className="mt-1 text-xs font-semibold text-white/70">{app.subcategory}</p></div></div><span className="absolute bottom-5 right-5 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur-sm transition group-hover:bg-white group-hover:text-[#17121F]"><ArrowUpRight className="h-4 w-4" /></span></Link><div className="p-4"><p className="line-clamp-2 min-h-10 text-sm leading-5 text-white/60">{app.description}</p><div className="mt-4 flex items-center justify-between gap-3 text-xs font-bold"><span className="inline-flex items-center gap-1.5 text-[#FBBF24]"><Star className="h-3.5 w-3.5 fill-current" /> {app.rating} <span className="text-white/35">({app.ratingCount})</span></span><span className="inline-flex items-center gap-1.5 text-white/40"><Download className="h-3.5 w-3.5" /> {app.downloads}</span></div><div className="mt-4 flex items-center justify-between gap-3 border-t border-white/10 pt-3"><Link href={`/creator/${app.creatorUsername}`} className="truncate text-xs font-bold text-white/50 transition hover:text-white">By {app.creatorName}</Link><StoreGetButton slug={app.slug} compact /></div></div></article>;
+  return (
+    <article className={`group overflow-hidden rounded-2xl border border-[#e8eaf0] bg-white shadow-[0_4px_18px_rgba(27,31,44,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#d8d0eb] hover:shadow-[0_12px_30px_rgba(27,31,44,0.1)] ${featured ? 'min-h-[270px]' : ''}`}>
+      {featured && <div className={`h-28 bg-gradient-to-r ${app.accent}`} />}
+      <div className="p-5">
+        <div className="flex items-start gap-4">
+          <span className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${app.accent} text-sm font-black text-white shadow-sm`}>{app.icon}</span>
+          <div className="min-w-0 flex-1">
+            <Link href={`/app/${app.slug}`} className="flex items-start justify-between gap-2">
+              <span className="truncate text-base font-bold text-[#202124] transition group-hover:text-[#6750a4]">{app.name}</span>
+              <ArrowUpRight className="h-4 w-4 shrink-0 text-[#8b8e95]" />
+            </Link>
+            <p className="mt-1 truncate text-sm text-[#6f7278]">{app.creatorName}</p>
+          </div>
+        </div>
+        <p className="mt-4 line-clamp-2 text-sm leading-6 text-[#5f6368]">{app.description}</p>
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-[#f0f1f4] pt-3 text-xs text-[#6f7278]">
+          <span className="inline-flex items-center gap-1 font-semibold text-[#3c4043]"><Star className="h-3.5 w-3.5 fill-[#f4b400] text-[#f4b400]" />{Number(app.rating).toFixed(1)}</span>
+          <span>{app.category}</span>
+          <span className="inline-flex items-center gap-1"><Download className="h-3.5 w-3.5" />{app.downloads}</span>
+          <span className="ml-auto"><StoreGetButton app={app} /></span>
+        </div>
+      </div>
+    </article>
+  );
 }
