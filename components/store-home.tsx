@@ -1,29 +1,182 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ChevronRight, Search, SlidersHorizontal, Sparkles, Star } from 'lucide-react';
-import { storeApps, storeCategories, type StoreApp, type StoreCategory } from '@/lib/v3-data';
-import { StoreBottomNav, StoreFooter, StoreHeader } from './store-shell';
-import { StoreCard } from './store-card';
+import { Search, UserRound, Store as StoreIcon, ChevronDown, LogOut, UserCircle2, FolderOpen } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
-export function StoreHome() {
-  const [query, setQuery] = useState('');
-  const [category, setCategory] = useState<StoreCategory | 'All'>('All');
-  const [publishedApps, setPublishedApps] = useState<StoreApp[]>([]);
+export function StoreLogo() {
+  return (
+    <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Appzyna Store home">
+      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#7C3AED] via-[#4F46E5] to-[#F97316] text-sm font-black text-white shadow-lg shadow-violet-500/25">
+        A
+      </span>
+      <span className="text-lg font-black tracking-[-0.04em] text-white">Appzyna</span>
+    </Link>
+  );
+}
+
+export function StoreHeader() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [userName, setUserName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [isSigningIn, setIsSigningIn] = useState(false);
+
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('appzyna_published_apps') || '[]') as Array<Partial<StoreApp> & { slug?: string; name?: string; category?: StoreCategory; description?: string; icon?: string; accent?: string; creatorName?: string; creatorUsername?: string; rating?: number; ratingCount?: string; downloads?: string }>;
-    setPublishedApps(saved.filter((app) => app.slug && app.name).map((app) => ({
-      id: app.id || app.slug || app.name || 'published-app', slug: app.slug || app.name!.toLowerCase().replace(/\s+/g, '-'), name: app.name!, category: app.category || 'Shops', subcategory: 'New on Appzyna', description: app.description || 'A new app published by a Ghanaian creator.', longDescription: app.description || 'A new app published by a Ghanaian creator.', accent: app.accent || 'from-[#7C3AED] via-[#8B5CF6] to-[#F97316]', icon: app.icon || app.name!.slice(0, 2).toUpperCase(), creatorName: app.creatorName || 'Appzyna creator', creatorUsername: app.creatorUsername || 'king', rating: app.rating || 0, ratingCount: app.ratingCount || 'New app', downloads: app.downloads || '0', tags: ['Made in Ghana'], screenshots: [], reviews: [], status: 'Published',
-    })));
-  }, []);
-  const catalog = useMemo(() => [...publishedApps, ...storeApps], [publishedApps]);
-  const filteredApps = useMemo(() => catalog.filter((app) => {
-    const matchesCategory = category === 'All' || app.category === category;
-    const haystack = `${app.name} ${app.description} ${app.category} ${app.subcategory} ${app.tags.join(' ')}`.toLowerCase();
-    return matchesCategory && haystack.includes(query.toLowerCase());
-  }), [catalog, category, query]);
-  const trending = catalog.filter((app) => app.isFeatured || app.rating >= 4.8 || publishedApps.some((published) => published.id === app.id));
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) {
+      return;
+    }
 
-  return <div className="min-h-screen bg-[#09090B] text-white"><StoreHeader /><main><section className="relative overflow-hidden border-b border-white/10 bg-[radial-gradient(circle_at_12%_15%,rgba(124,58,237,.32),transparent_28%),radial-gradient(circle_at_82%_24%,rgba(249,115,22,.22),transparent_24%),#09090B] px-5 pb-12 pt-12 sm:px-8 sm:pb-16 sm:pt-16 lg:px-10 lg:pb-20"><div className="absolute -bottom-24 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[#7C3AED]/20 blur-3xl" /><div className="relative mx-auto max-w-[1240px]"><div className="flex items-center gap-2 text-[0.65rem] font-black uppercase tracking-[0.22em] text-[#FBBF24]"><span className="rounded-full border border-[#FBBF24]/30 px-2 py-1">GH</span> Made in Ghana · built for everyone</div><h1 className="mt-6 max-w-4xl font-display text-5xl font-black leading-[0.95] tracking-[-0.075em] sm:text-7xl">Discover Apps Built <span className="bg-gradient-to-r from-[#A78BFA] via-[#F97316] to-[#FBBF24] bg-clip-text text-transparent">In Ghana.</span></h1><p className="mt-6 max-w-xl text-base leading-7 text-white/58 sm:text-lg">Find local shops, food, fashion, churches, music, and games made by people building from Accra to Tamale.</p><div className="mt-8 flex max-w-3xl flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.07] p-2 shadow-store backdrop-blur-sm sm:flex-row"><div className="flex min-w-0 flex-1 items-center gap-3 px-3"><Search className="h-5 w-5 shrink-0 text-[#F97316]" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search apps, fashion, food, shoes..." aria-label="Search apps" className="min-w-0 flex-1 bg-transparent py-3 text-sm font-semibold text-white outline-none placeholder:text-white/35" /></div><button type="button" onClick={() => document.getElementById('trending')?.scrollIntoView({ behavior: 'smooth' })} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F97316] px-6 py-3.5 text-sm font-black text-white transition hover:bg-[#EA580C]">Explore Store <ArrowRight className="h-4 w-4" /></button></div><div className="mt-8 flex flex-wrap gap-2"><button type="button" onClick={() => setCategory('All')} className={`rounded-full px-3.5 py-2 text-xs font-bold transition ${category === 'All' ? 'bg-white text-[#17121F]' : 'border border-white/10 bg-white/5 text-white/55 hover:text-white'}`}>All apps</button>{storeCategories.map((item) => <button type="button" key={item.name} onClick={() => setCategory(item.name)} className={`rounded-full px-3.5 py-2 text-xs font-bold transition ${category === item.name ? 'bg-white text-[#17121F]' : 'border border-white/10 bg-white/5 text-white/55 hover:text-white'}`}>{item.emoji} {item.name}</button>)}</div></div></section><section id="trending" className="mx-auto max-w-[1240px] px-5 py-12 sm:px-8 lg:px-10"><div className="flex items-end justify-between gap-4"><div><p className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-[#F97316]">Trending in Ghana</p><h2 className="mt-2 font-display text-3xl font-black tracking-[-0.055em] sm:text-4xl">Worth the download.</h2></div><Link href="#all-apps" className="hidden items-center gap-1 text-sm font-black text-white/55 hover:text-white sm:inline-flex">See all <ChevronRight className="h-4 w-4" /></Link></div><div className="store-scrollbar mt-7 grid auto-cols-[minmax(300px,1fr)] grid-flow-col gap-5 overflow-x-auto pb-3 md:grid-flow-row md:grid-cols-3 md:overflow-visible">{trending.map((app) => <StoreCard key={app.id} app={app} featured />)}</div></section><section className="border-y border-white/10 bg-[#100E16] px-5 py-10 sm:px-8 lg:px-10"><div className="mx-auto max-w-[1240px]"><div className="flex items-center justify-between"><div><p className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-white/35">Browse by mood</p><h2 className="mt-2 font-display text-2xl font-black tracking-[-0.05em]">Find your corner.</h2></div><SlidersHorizontal className="h-5 w-5 text-white/35" /></div><div className="store-scrollbar mt-6 flex gap-3 overflow-x-auto pb-2">{storeCategories.map((item) => <button type="button" key={item.name} onClick={() => setCategory(item.name)} className="group flex min-w-[145px] items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-left transition hover:-translate-y-0.5 hover:border-white/25"><span className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${item.tone} text-xl shadow-store`}>{item.emoji}</span><span className="text-sm font-black text-white/75 group-hover:text-white">{item.name}</span></button>)}</div></div></section><section id="all-apps" className="mx-auto max-w-[1240px] px-5 py-12 pb-28 sm:px-8 lg:px-10 lg:pb-16"><div className="flex items-end justify-between gap-4"><div><p className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-white/35">The full shelf</p><h2 className="mt-2 font-display text-3xl font-black tracking-[-0.055em]">{category === 'All' ? 'All apps' : category}</h2></div><span className="inline-flex items-center gap-1 text-xs font-bold text-white/35"><Star className="h-3.5 w-3.5 fill-[#FBBF24] text-[#FBBF24]" /> Curated locally</span></div>{filteredApps.length ? <div className="mt-7 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{filteredApps.map((app) => <StoreCard key={app.id} app={app} />)}</div> : <div className="mt-7 rounded-2xl border border-white/10 bg-white/[0.04] px-5 py-12 text-center"><Sparkles className="mx-auto h-6 w-6 text-[#F97316]" /><p className="mt-4 font-display text-xl font-black">No app matches that search yet.</p><p className="mt-2 text-sm text-white/45">Try a Ghanaian category, name, or creator.</p></div>}</section></main><StoreFooter /><StoreBottomNav active="home" /></div>;
+    const syncSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const user = session?.user;
+      const image = (user?.user_metadata?.avatar_url as string | undefined) ?? (user?.user_metadata?.picture as string | undefined) ?? '';
+      const name = (user?.user_metadata?.full_name as string | undefined) ?? (user?.email ?? 'Google User');
+      setAvatarUrl(image);
+      setUserName(name);
+    };
+
+    void syncSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      const image = (user?.user_metadata?.avatar_url as string | undefined) ?? (user?.user_metadata?.picture as string | undefined) ?? '';
+      const name = (user?.user_metadata?.full_name as string | undefined) ?? (user?.email ?? 'Google User');
+      setAvatarUrl(image);
+      setUserName(name);
+    });
+
+    return () => authListener.subscription.unsubscribe();
+  }, []);
+
+  async function handleGoogleSignIn() {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) {
+      return;
+    }
+
+    setIsSigningIn(true);
+    try {
+      const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
+      await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: redirectTo ? { redirectTo } : undefined,
+      });
+    } catch (_error) {
+      setIsSigningIn(false);
+    }
+  }
+
+  async function handleSignOut() {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) return;
+    await supabase.auth.signOut();
+    setAvatarUrl('');
+    setUserName('');
+    setIsOpen(false);
+  }
+
+  const hasUser = Boolean(avatarUrl || userName);
+
+  return (
+    <header className="sticky top-0 z-30 border-b border-white/10 bg-[#0F1115]/90 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <StoreLogo />
+        </div>
+
+        <div className="hidden min-w-[280px] max-w-[560px] flex-1 items-center justify-center md:flex">
+          <label className="flex w-full items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/60 shadow-inner shadow-white/5">
+            <Search className="h-4 w-4" />
+            <input
+              aria-label="Search apps"
+              className="w-full bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+              placeholder="Search apps, games, food, shops..."
+              disabled
+            />
+          </label>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {!hasUser ? (
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isSigningIn}
+              className="inline-flex items-center justify-center rounded-full bg-[#1a73e8] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#185abc] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isSigningIn ? 'Signing in...' : 'Sign In'}
+            </button>
+          ) : (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsOpen((prev) => !prev)}
+                className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-1.5 text-sm text-white transition hover:bg-white/10"
+              >
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={userName} className="h-8 w-8 rounded-full border border-white/20 object-cover" />
+                ) : (
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1a73e8] font-bold text-white">
+                    {userName.slice(0, 1).toUpperCase()}
+                  </span>
+                )}
+                <ChevronDown className="h-4 w-4 text-white/70" />
+              </button>
+
+              {isOpen && (
+                <div className="absolute right-0 top-[calc(100%+10px)] w-48 overflow-hidden rounded-xl border border-white/10 bg-[#171a20] shadow-2xl">
+                  <button type="button" className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-white/90 hover:bg-white/5">
+                    <UserCircle2 className="h-4 w-4" /> My Account
+                  </button>
+                  <button type="button" className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-white/90 hover:bg-white/5">
+                    <FolderOpen className="h-4 w-4" /> My Apps
+                  </button>
+                  <button type="button" onClick={handleSignOut} className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-red-300 hover:bg-white/5">
+                    <LogOut className="h-4 w-4" /> Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function StoreBottomNav({ active = 'home' }: { active?: 'home' | 'store' | 'search' | 'profile' }) {
+  const items = [
+    { id: 'home', label: 'Home', href: '/', icon: StoreIcon },
+    { id: 'store', label: 'Store', href: '/#featured', icon: StoreIcon },
+    { id: 'search', label: 'Search', href: '/#search', icon: Search },
+    { id: 'profile', label: 'Profile', href: '/', icon: UserRound },
+  ] as const;
+
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#0B0A0F]/95 px-5 pb-[max(0.7rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl md:hidden">
+      <div className="mx-auto flex max-w-md items-center justify-between text-xs font-medium text-white/60">
+        {items.map(({ id, label, href, icon: Icon }) => (
+          <Link key={id} href={href} className={`flex flex-col items-center gap-1 ${active === id ? 'text-white' : ''}`}>
+            <Icon className="h-5 w-5" />
+            {label}
+          </Link>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
+export function StoreFooter() {
+  return (
+    <footer className="border-t border-white/10 bg-[#09090B] px-5 py-8 pb-24 text-white/45 sm:px-8 md:pb-8 lg:px-10">
+      <div className="mx-auto flex max-w-[1240px] flex-col gap-3 text-xs font-medium sm:flex-row sm:items-center sm:justify-between">
+        <p>Appzyna Store • empty catalog • Play Store styled</p>
+        <p>Google sign in ready</p>
+      </div>
+    </footer>
+  );
 }
