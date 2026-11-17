@@ -1,119 +1,30 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { ArrowRight, Search, Star } from 'lucide-react';
-import { StoreBottomNav, StoreFooter, StoreHeader } from './store-shell';
-import { storeApps, type StoreCategory } from '@/lib/v3-data';
+import { FormEvent, useState } from 'react';
+import Link from 'next/link';
+import { ArrowRight, BarChart3, ChevronRight, Download, FilePlus2, Globe2, Layers3, LogOut, Plus, Settings, Sparkles, Store, TrendingUp, UsersRound } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { BrandMark } from './brand-mark';
+import { PortalBottomNav } from './portal-bottom-nav';
+import { storeApps } from '@/lib/v3-data';
 
-const categories: Array<'All' | Exclude<StoreCategory, 'All'>> = ['All', 'Games', 'Food', 'Shop', 'Education', 'Business'];
+const chartPoints = '0,126 58,108 116,112 174,72 232,86 290,24 348,47 406,16';
 
-export function StoreHome() {
-  const [category, setCategory] = useState<'All' | Exclude<StoreCategory, 'All'>>('All');
-  const [query, setQuery] = useState('');
+export function PortalDashboard() {
+  const router = useRouter();
+  const [website, setWebsite] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  function handleGenerate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsGenerating(true);
+    router.push(website.trim() ? `/creator/new?website=${encodeURIComponent(website.trim())}` : '/creator/new');
+  }
+  return <div className="min-h-screen bg-[#F4F3F8] text-[#14121F]"><header className="border-b border-[#14121F]/10 bg-white"><div className="mx-auto flex max-w-[1440px] items-center justify-between gap-5 px-5 py-4 sm:px-8 lg:px-10"><BrandMark /><div className="flex items-center gap-2 sm:gap-3"><Link href="/store" className="hidden items-center gap-2 rounded-xl border border-[#14121F]/10 px-4 py-2.5 text-xs font-black text-[#14121F]/65 transition hover:border-purple/30 hover:text-purple sm:inline-flex"><Store className="h-4 w-4" /> Visit Store</Link><Link href="/creator/king" className="hidden items-center gap-2 rounded-xl bg-[#14121F] px-4 py-2.5 text-xs font-black text-white transition hover:bg-purple sm:inline-flex"><UsersRound className="h-4 w-4" /> Profile</Link><span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple to-orange text-sm font-black text-white">K</span></div></div></header><div className="mx-auto flex max-w-[1440px]"><aside className="hidden min-h-[calc(100vh-74px)] w-64 shrink-0 border-r border-[#14121F]/10 bg-white px-5 py-8 lg:block"><p className="px-3 text-[0.62rem] font-black uppercase tracking-[0.2em] text-[#14121F]/35">Creator portal</p><nav className="mt-5 space-y-1.5"><Link href="/dashboard" className="flex items-center gap-3 rounded-xl bg-purple/10 px-3 py-3 text-sm font-black text-purple"><Layers3 className="h-4 w-4" /> Dashboard</Link><Link href="#apps" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-[#14121F]/55 transition hover:bg-orange/10 hover:text-orange"><SmartphoneIcon /> My Apps</Link><Link href="#analytics" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-[#14121F]/55 transition hover:bg-orange/10 hover:text-orange"><BarChart3 className="h-4 w-4" /> Analytics</Link><Link href="/creator/new" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-[#14121F]/55 transition hover:bg-orange/10 hover:text-orange"><FilePlus2 className="h-4 w-4" /> Build an App</Link><Link href="#settings" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-[#14121F]/55 transition hover:bg-orange/10 hover:text-orange"><Settings className="h-4 w-4" /> Settings</Link></nav><div className="mt-12 rounded-2xl bg-gradient-to-br from-[#2E1065] via-[#6D28D9] to-[#F97316] p-5 text-white"><Sparkles className="h-5 w-5 text-[#FBBF24]" /><p className="mt-7 text-sm font-black leading-5">Your next customer is already looking for you.</p><Link href="/store" className="mt-4 inline-flex items-center gap-1 text-xs font-black text-white hover:text-[#FBBF24]">Open Store <ChevronRight className="h-3.5 w-3.5" /></Link></div></aside><main className="min-w-0 flex-1"><section className="relative overflow-hidden bg-gradient-to-br from-[#2E1065] via-[#6D28D9] to-[#F97316] px-5 py-10 text-white sm:px-8 sm:py-14 lg:px-10"><div className="absolute -right-20 -top-24 h-80 w-80 rounded-full bg-[#FDBA74]/30 blur-3xl" /><div className="relative mx-auto flex max-w-[1160px] flex-col justify-between gap-6 xl:flex-row xl:items-end"><div><p className="text-[0.65rem] font-black uppercase tracking-[0.22em] text-white/60">Tuesday, Accra · Creator portal</p><h1 className="mt-4 font-display text-4xl font-black leading-[.98] tracking-[-.07em] sm:text-6xl">Welcome back, King.</h1><p className="mt-4 max-w-xl text-base leading-7 text-white/75">Build your next app, see what is moving, and put your business in front of more people across Ghana.</p></div><Link href="/creator/new" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-3.5 text-sm font-black text-[#14121F] transition hover:bg-[#FBBF24]"><Plus className="h-4 w-4" /> Publish New App</Link></div></section><section className="mx-auto max-w-[1160px] px-5 py-8 pb-28 sm:px-8 sm:py-10 lg:px-10 lg:pb-14"><div className="mb-5 flex gap-2 overflow-x-auto lg:hidden"><Link href="/dashboard" className="shrink-0 rounded-lg bg-purple px-3 py-2 text-xs font-black text-white">Dashboard</Link><Link href="#apps" className="shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-black text-[#14121F]/55">My Apps</Link><Link href="#analytics" className="shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-black text-[#14121F]/55">Analytics</Link><Link href="/creator/new" className="shrink-0 rounded-lg bg-white px-3 py-2 text-xs font-black text-[#14121F]/55">Build</Link></div><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><StatCard label="Total Downloads" value="12,480" delta="+842 this month" percentage="+12%" icon={<Download className="h-4 w-4" />} tone="purple" /><StatCard label="Revenue" value="$3,240" delta="+$520 this month" percentage="+18%" icon={<TrendingUp className="h-4 w-4" />} tone="orange" /><StatCard label="Published Apps" value="06" delta="2 in review" percentage="Live" icon={<Layers3 className="h-4 w-4" />} tone="dark" /><StatCard label="Store Visits" value="8,906" delta="+1,214 this month" percentage="+16%" icon={<UsersRound className="h-4 w-4" />} tone="green" /></div><section className="mt-8 rounded-[26px] bg-gradient-to-br from-[#2E1065] via-[#6D28D9] to-[#F97316] p-6 text-white shadow-[0_24px_60px_rgba(74,35,151,.2)] sm:p-8"><div className="flex flex-col justify-between gap-6 md:flex-row md:items-end"><div><div className="flex items-center gap-2 text-[0.65rem] font-black uppercase tracking-[0.2em] text-white/60"><Sparkles className="h-4 w-4 text-[#FBBF24]" /> AI Builder</div><h2 className="mt-4 max-w-xl font-display text-3xl font-black tracking-[-.06em] sm:text-4xl">Paste Website Link to Create App in 60 seconds</h2><p className="mt-3 max-w-lg text-sm leading-6 text-white/70">We read the real story, shape a Store listing, and let you edit before it goes live.</p></div><Link href="/creator/new" className="inline-flex items-center gap-2 text-sm font-black text-white hover:text-[#FBBF24]">Open full builder <ArrowRight className="h-4 w-4" /></Link></div><form onSubmit={handleGenerate} className="mt-7 flex max-w-3xl flex-col gap-3 rounded-2xl bg-white p-2 sm:flex-row"><div className="flex min-w-0 flex-1 items-center gap-3 px-3"><Globe2 className="h-5 w-5 shrink-0 text-purple" /><input value={website} onChange={(event) => setWebsite(event.target.value)} placeholder="https://yourwebsite.com" className="min-w-0 flex-1 bg-transparent py-3 text-sm font-semibold text-[#14121F] outline-none placeholder:text-[#14121F]/35" /></div><button type="submit" disabled={isGenerating} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#F97316] px-6 py-3.5 text-sm font-black text-white transition hover:bg-[#EA580C] disabled:opacity-60">{isGenerating ? 'Opening builder...' : 'Generate app'} <ArrowRight className="h-4 w-4" /></button></form></section><div className="mt-8 grid gap-8 xl:grid-cols-[1.1fr_0.9fr]"><section id="apps" className="rounded-[24px] border border-[#14121F]/10 bg-white p-5 shadow-card sm:p-7"><div className="flex items-end justify-between gap-4"><div><p className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-orange">My Apps</p><h2 className="mt-2 font-display text-2xl font-black tracking-[-.055em]">Your published shelf.</h2></div><Link href="/creator/new" className="inline-flex items-center gap-1 text-xs font-black text-purple">Add app <Plus className="h-3.5 w-3.5" /></Link></div><div className="mt-6 divide-y divide-[#14121F]/10">{storeApps.slice(0, 4).map((app, index) => <div key={app.id} className="flex items-center gap-3 py-4 first:pt-0 last:pb-0"><span className={`flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${app.accent} text-[0.65rem] font-black text-white`}>{app.icon}</span><div className="min-w-0 flex-1"><p className="truncate text-sm font-black">{app.name}</p><p className="mt-1 text-xs font-semibold text-[#14121F]/45">{app.category} · {index === 3 ? 'Draft' : 'Published'}</p></div><div className="hidden text-right sm:block"><p className="text-sm font-black">{app.downloads}</p><p className="mt-1 text-[0.62rem] font-bold text-[#14121F]/40">downloads</p></div><span className={`rounded-full px-2.5 py-1 text-[0.62rem] font-black ${index === 3 ? 'bg-amber-500/10 text-amber-600' : 'bg-emerald-500/10 text-emerald-600'}`}>{index === 3 ? 'Draft' : 'Published'}</span></div>)}</div></section><section id="analytics" className="rounded-[24px] border border-[#14121F]/10 bg-white p-5 shadow-card sm:p-7"><div className="flex items-start justify-between gap-4"><div><p className="text-[0.65rem] font-black uppercase tracking-[0.2em] text-purple">Analytics</p><h2 className="mt-2 font-display text-2xl font-black tracking-[-.055em]">Downloads this week.</h2></div><span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[0.62rem] font-black text-emerald-600">+23% vs last week</span></div><div className="mt-7 overflow-hidden"><svg viewBox="0 0 406 150" className="h-[170px] w-full overflow-visible" role="img" aria-label="Downloads line chart Monday to Sunday"><defs><linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="#7C3AED" stopOpacity=".3" /><stop offset="100%" stopColor="#7C3AED" stopOpacity="0" /></linearGradient></defs><path d={`M${chartPoints} L406,150 L0,150 Z`} fill="url(#chartFill)" /><polyline points={chartPoints} fill="none" stroke="#7C3AED" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse-line" /><circle cx="290" cy="24" r="6" fill="#F97316" stroke="white" strokeWidth="3" /></svg><div className="mt-2 flex justify-between text-[0.62rem] font-bold text-[#14121F]/35"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div></div><div className="mt-6 flex items-center gap-3 rounded-xl bg-[#F4F3F8] p-4"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange/10 text-orange"><BarChart3 className="h-5 w-5" /></span><div><p className="text-sm font-black">Peak: 2,104 downloads on Sat</p><p className="mt-1 text-xs font-semibold text-[#14121F]/45">Your Store shelf is picking up.</p></div></div></section></div><div id="settings" className="mt-6 flex items-center justify-between rounded-xl border border-[#14121F]/10 bg-white px-4 py-3 text-xs font-semibold text-[#14121F]/45"><span className="inline-flex items-center gap-2"><Globe2 className="h-4 w-4 text-orange" /> Powered by Appzyna Store v3</span><button type="button" className="inline-flex items-center gap-2 hover:text-[#14121F]"><LogOut className="h-3.5 w-3.5" /> Sign out</button></div></section></main><PortalBottomNav active="dashboard" /></div></div>;
+}
 
-  const filteredApps = useMemo(() => {
-    if (!storeApps.length) return [];
-    return storeApps.filter((app) => {
-      const matchesCategory = category === 'All' || app.category === category;
-      const haystack = `${app.name} ${app.description} ${app.category} ${app.subcategory}`.toLowerCase();
-      return matchesCategory && haystack.includes(query.toLowerCase());
-    });
-  }, [category, query]);
+function SmartphoneIcon() { return <span className="flex h-4 w-4 items-center justify-center rounded-[4px] border-2 border-current text-[0.45rem]">•</span>; }
 
-  const emptyMessage = 'No apps yet - Be the first to publish your app';
-
-  return (
-    <div className="min-h-screen bg-[#0a0a0d] text-white">
-      <StoreHeader />
-
-      <main className="mx-auto max-w-[1280px] px-4 pb-20 pt-6 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center justify-between gap-3">
-          <div className="hidden md:block text-xs font-semibold uppercase tracking-[0.2em] text-white/50">Discover</div>
-          <div className="flex w-full max-w-xl items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white/60 md:ml-auto">
-            <Search className="h-4 w-4" />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search apps, games, food, shops..."
-              className="w-full bg-transparent text-white placeholder:text-white/40 focus:outline-none"
-            />
-          </div>
-        </div>
-
-        <div className="mb-8 flex gap-2 overflow-x-auto pb-1">
-          {categories.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setCategory(item)}
-              className={[
-                'whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition',
-                category === item ? 'bg-white text-[#0a0a0d]' : 'bg-white/5 text-white/70 hover:bg-white/10',
-              ].join(' ')}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-
-        {filteredApps.length === 0 ? (
-          <section className="space-y-8">
-            <div className="rounded-[28px] border border-white/10 bg-[#15181d] p-8 text-center shadow-2xl shadow-black/20">
-              <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#1a73e8]/10 text-3xl text-[#8ab4ff]">📱</div>
-              <h1 className="text-3xl font-bold tracking-[-0.04em] text-white">{emptyMessage}</h1>
-              <p className="mt-3 text-sm text-white/60">The App Store is empty until a business publishes their first app through the Portal.</p>
-            </div>
-
-            <div className="grid gap-5 md:grid-cols-3">
-              {['Featured Apps', 'Top Charts', 'New Apps'].map((section) => (
-                <div key={section} className="rounded-[24px] border border-white/10 bg-[#15181d] p-5">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-bold tracking-[-0.03em] text-white">{section}</h2>
-                    <button type="button" className="text-sm text-[#8ab4ff]">See all</button>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-4 text-sm text-white/50">
-                      No apps yet
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        ) : (
-          <section className="space-y-8">
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {filteredApps.map((app) => (
-                <article key={app.id} className="overflow-hidden rounded-[22px] border border-white/10 bg-[#15181d] shadow-xl shadow-black/10">
-                  <div className={`h-28 bg-gradient-to-r ${app.accent}`} />
-                  <div className="p-4">
-                    <div className="mb-3 flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-sm font-black text-white">{app.icon}</div>
-                        <div>
-                          <h3 className="text-base font-bold text-white">{app.name}</h3>
-                          <p className="text-xs text-white/60">{app.creatorName}</p>
-                        </div>
-                      </div>
-                      <button type="button" className="rounded-full bg-[#1a73e8] px-3 py-1.5 text-xs font-semibold text-white">Install</button>
-                    </div>
-                    <div className="mb-3 flex items-center gap-2 text-xs text-white/70">
-                      <Star className="h-3.5 w-3.5 fill-[#facc15] text-[#facc15]" />
-                      <span>{app.rating}</span>
-                      <span className="text-white/40">•</span>
-                      <span>{app.category}</span>
-                    </div>
-                    <p className="line-clamp-2 text-sm text-white/70">{app.description}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
-      </main>
-
-      <StoreFooter />
-      <StoreBottomNav />
-    </div>
-  );
+function StatCard({ label, value, delta, percentage, icon, tone }: { label: string; value: string; delta: string; percentage: string; icon: React.ReactNode; tone: 'purple' | 'orange' | 'dark' | 'green' }) {
+  const tones = { purple: 'text-purple bg-purple/10', orange: 'text-orange bg-orange/10', dark: 'text-white bg-white/10', green: 'text-emerald-600 bg-emerald-500/10' };
+  return <article className={`rounded-[20px] border border-[#14121F]/10 p-5 shadow-card ${tone === 'dark' ? 'bg-[#14121F] text-white' : 'bg-white'}`}><div className="flex items-center justify-between"><span className={`text-[0.62rem] font-black uppercase tracking-[0.16em] ${tone === 'dark' ? 'text-white/50' : 'text-[#14121F]/45'}`}>{label}</span><span className={`flex h-8 w-8 items-center justify-center rounded-xl ${tones[tone]}`}>{icon}</span></div><p className="mt-5 font-display text-3xl font-black tracking-[-.06em]">{value}</p><div className="mt-2 flex items-center justify-between gap-2"><p className={`text-xs font-semibold ${tone === 'dark' ? 'text-white/45' : 'text-[#14121F]/45'}`}>{delta}</p><span className={`text-xs font-black ${tone === 'dark' ? 'text-[#FBBF24]' : 'text-emerald-600'}`}>{percentage}</span></div></article>;
 }
