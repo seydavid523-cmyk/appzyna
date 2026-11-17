@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #14121F;
+  --paper: #F8F7FC;
+  --purple: #7C3AED;
+  --orange: #F97316;
+  --gold: #FBBF24;
+  --store-ink: #09090B;
+  --store-panel: #15131D;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+::selection { background: rgba(124, 58, 237, 0.22); color: var(--ink); }
+button, input, textarea, select { font: inherit; }
+.font-display { font-family: "Arial Black", Inter, ui-sans-serif, system-ui, sans-serif; }
+.text-balance { text-wrap: balance; }
+
+@layer components {
+  .eyebrow { @apply text-[0.65rem] font-black uppercase tracking-[0.2em] text-ink/40; }
+  .field-label { @apply block text-[0.68rem] font-black uppercase tracking-[0.16em] text-ink/55; }
+  .field-input { @apply mt-2.5 w-full rounded-2xl border border-ink/10 bg-white px-4 py-3.5 text-sm font-semibold text-ink outline-none transition placeholder:text-ink/25 focus:border-purple focus:ring-4 focus:ring-purple/10; }
+  .field-input.with-icon { @apply pl-11; }
+  .field-icon { @apply pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/30; }
+  .store-scrollbar { scrollbar-width: none; }
+  .store-scrollbar::-webkit-scrollbar { display: none; }
+}
+
+@keyframes float-up {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+@keyframes drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(12px, -10px, 0) scale(1.05); }
+}
+@keyframes pulse-line {
+  0%, 100% { opacity: .65; transform: scaleX(1); }
+  50% { opacity: 1; transform: scaleX(1.03); }
+}
+.animate-float-up { animation: float-up 5s ease-in-out infinite; }
+.animate-drift { animation: drift 8s ease-in-out infinite; }
+.animate-pulse-line { animation: pulse-line 4s ease-in-out infinite; transform-origin: left; }
